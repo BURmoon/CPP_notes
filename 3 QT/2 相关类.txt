@@ -1,0 +1,445 @@
+## QObject类
+
+- 创建一个QObject对象时，QObject的构造函数接收一个QObject指针作为参数，这个参数就是父对象指针
+
+  在创建QObject对象时，这个QObject对象会自动添加到其父对象的children()列表
+
+  当父对象析构的时候，这个children()列表中的所有对象也会被析构（父对象并不是继承意义上的父类）
+
+- 当一个QObject对象在堆上创建的时候，Qt会同时为其创建一个对象树
+
+  - 对象树中对象的顺序是没有定义的，即销毁这些对象的顺序也是未定义的
+  - 任何对象树中的 QObject对象 delete 的时候
+    - 如果这个对象有 parent，则自动将其从 parent 的 children() 列表中删除
+    - 如果有 children()，则自动 delete 每一个 children
+
+## QWidget类
+
+- QWidget是能够在屏幕上显示的一切组件的父类
+- QWidget继承自QObject，因此也继承了对象树关系
+
+## QMainWindow类
+
+> QMainWindow是一个为用户提供主窗口程序的类
+>
+> 包含：一个菜单栏(menu bar)，多个工具栏(tool bars)，多个锚接部件(dock widgets)，一个状态栏(status bar)，一个中心部件(central widget)
+
+- 菜单栏
+
+  > 一个主窗口最多只有一个菜单栏，位于主窗口顶部、主窗口标题栏下面
+
+  - 创建菜单栏
+
+    通过 menubar() 函数获取主窗口菜单栏指针：`QMenuBar * menuBar() const`
+
+  - 创建菜单
+
+    调用QMenu的成员函数addMenu来添加菜单：
+
+    ```
+    QAction* addMenu(QMenu * menu)
+    QMenu* addMenu(const QString & title)
+    QMenu* addMenu(const QIcon & icon, const QString & title)
+    ```
+
+  - 创建菜单项
+
+    调用QMenu的成员函数addAction来添加菜单项：
+
+    ```
+    QAction* activeAction() const
+    QAction* addAction(const QString & text)
+    QAction* addAction(const QIcon & icon, const QString & text)
+    ```
+
+  - 添加分割线
+
+    `fileMenu->addSeparator();`
+
+- 工具栏
+
+  > 主窗口的工具栏上可以有多个工具条
+
+  - 创建工具条
+
+    直接调用 addToolBar() 函数获取主窗口的工具条对象：
+
+    ```
+    QToolBar* toolbar = new QToolBar();
+    addToolBar( 默认停靠范围 Qt::LeftToolBarArea  ,toolbar)	//添加到窗口中
+    ```
+
+  - 插入工具条
+
+    通过QToolBar类的addAction函数添加
+
+  - 工具条的停靠区域
+
+    - Qt::LeftToolBarArea		停靠在左侧
+
+      Qt::RightToolBarArea	停靠在右侧
+
+      Qt::TopToolBarArea		停靠在顶部
+
+      Qt::BottomToolBarArea   	停靠在底部
+
+      Qt::AllToolBarAreas		以上四个位置都可停靠
+
+    - 使用 setAllowedAreas() 函数指定停靠区域：
+
+      `setAllowedAreas(Qt::LeftToolBarArea | Qt::RightToolBarArea);`
+
+    - 使用 setMoveable() 函数设定工具栏的可移动性：
+
+      `setMoveable(false);//工具条不可移动, 只能停靠在初始化的位置上`
+
+- 状态栏
+
+  > 派生自QWidget类，状态栏也只能最多有一个
+
+  - 创建状态栏
+
+    ```
+    QStatusBar *stBar = statusBar();
+    setStatusBar(stBar);
+    ```
+
+  - 添加小部件：`void addWidget(QWidget * widget, int stretch = 0)`
+
+  - 插入小部件：`int insertWidget(int index, QWidget * widget, int stretch = 0)`
+
+  - 删除小部件：`void removeWidget(QWidget * widget)`
+
+- 铆接部件
+
+  > 铆接部件 QDockWidget，也称浮动窗口，可以有多个
+
+  - 创建铆接部件
+
+    ```
+    QDockWidget * dock = new QDockWidget("标题",this);
+    addDockWidget(Qt::LeftDockWidgetArea,dock);
+    ```
+
+  - 设置区域范围
+
+    `dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::TopDockWidgetArea);`
+
+- 核心部件（中心部件）
+
+  - 例如一个记事本文件，可以利用QTextEdit做核心部件
+
+    ```
+    QTextEdit * edit = new QTextEdit(this);
+    setCentralWidget(edit);
+    ```
+
+## QAction类
+
+- Qt并没有专门的菜单项类，只是使用一个QAction类，抽象出公共的动作
+
+- 把QAction对象添加到菜单，就显示成一个菜单项，添加到工具栏，就显示成一个工具按钮
+
+  可以通过点击菜单项、点击工具栏按钮、点击快捷键来激活这个动作
+
+## QApplication应用程序类
+
+> 管理图形用户界面应用程序的控制流和主要设置
+
+- 包含主事件循环，在其中来自窗口系统和其它资源的所有事件处理和调度
+  - 处理应用程序的初始化和结束，并且提供对话管理
+  - 对于任何一个使用Qt的图形用户界面应用程序，都正好存在一个QApplication 对象
+
+## QPushButton类
+
+- 按钮的创建
+
+  ```
+  QPushButton * btn = new QPushButton;
+  QPushButton * btn = new QPushButton("aaa",this)；
+  btn->setParent(this);					//设置父亲
+  btn->setText("bbb");					//设置文字
+  btn->move(100,100);						//移动位置
+  ```
+
+## QDialog类
+
+> 使用QDialog类实现对话框
+
+- QDialog（及其子类，以及所有Qt::Dialog类型的类）的对于其 parent 指针都有额外的解释
+  - 如果 parent 为 NULL，则该对话框会作为一个顶层窗口
+  - 如果 parent 不为 NULL，则作为其父组件的子对话框（此时，其默认出现的位置是 parent 的中心）
+
+  > 顶层窗口与非顶层窗口的区别：
+  >
+  > ​	顶层窗口在任务栏会有自己的位置，而非顶层窗口则会共享其父组件的位置
+- 自定义消息框
+  - 模态对话框：就是会阻塞同一应用程序中其它窗口的输入
+
+    - 应用程序级别的模态
+
+      `QDialog::exec()	//实现应用程序级别的模态对话框`
+
+      当该种模态的对话框出现时，用户必须首先对对话框进行交互，直到关闭对话框，然后才能访问程序中其他的窗口
+
+    - 窗口级别的模态
+
+      `QDialog::open()	//实现窗口级别的模态对话框`
+
+      该模态仅仅阻塞与对话框关联的窗口，但是依然允许用户与程序中其它窗口交互
+
+    - 示例：
+
+    ```
+    QDialog dialog;
+    dialog.exec();
+    ```
+
+  - 非模态对话框：与模态对话框相反
+
+    `QDialog::show()	//实现非模态对话框`
+
+    - dialog 建立在堆上时，需要避免dialog 存在内存泄露
+
+      将主窗口作为 parent 时，主窗口不关闭，对话框就不会被销毁，会一直占用内存
+
+      所以可以设置 dialog 的WindowAttribute，setAttribute()函数设置对话框关闭时，自动销毁对话框
+
+      ```
+      QDialog *dialog = new QDialog;
+      dialog->setAttribute(Qt::WA_DeleteOnClose);
+      dialog->show();
+      ```
+
+- 标准对话框
+
+  > 标准对话框，是 Qt 内置的一系列对话框
+
+  - QColorDialog：		选择颜色
+  - QFileDialog：		选择文件或者目录
+  - QFontDialog：		选择字体
+  - QInputDialog：		允许用户输入一个值，并将其值返回
+  - QMessageBox：		模态对话框，用于显示信息、询问问题等
+  - QProgressDialog：		显示操作过程
+
+- 消息对话框
+
+  > QMessageBox是QDialog的子类，用于显示消息提示
+
+  - 显示关于对话框
+
+    ```
+    void about(QWidget * parent, const QString & title, const QString & text)
+    --parent：父窗口
+    --title：标题
+    --text：	内容
+    ```
+
+    - 对话框只有一个 OK 按钮
+
+  - 显示关于Qt对话框
+
+    ```
+    void aboutQt(QWidget * parent, const QString & title = QString())
+    ```
+
+    - 该对话框用于显示有关Qt的信息
+
+  - 显示critical对话框
+
+    ```
+    StandardButton critical(QWidget * parent, const QString & title,
+    			const QString & text, StandardButtons buttons = Ok, 
+    			StandardButton defaultButton = NoButton)
+    --buttons：指明其显示的按钮，默认情况下只有一个 Ok 按钮
+    --StandardButtons：指定多种按钮
+    ```
+
+    - 对话框将显示一个红色的错误符号
+
+  - 显示信息对话框
+
+    ```
+    StandardButton information(QWidget * parent, const QString & title, 
+    			const QString & text, StandardButtons buttons = Ok, 
+    			StandardButton defaultButton = NoButton)
+    ```
+
+    - 与QMessageBox::critical()类似，不同之处在于这个对话框提供一个普通信息图标
+
+  - 显示question对话框
+
+    ```
+    StandardButton question(QWidget * parent,const QString & title, 
+    			const QString & text, 
+    			StandardButtons buttons = StandardButtons( Yes | No ), 
+    			StandardButton defaultButton = NoButton) 
+    ```
+
+    - 与QMessageBox::critical ()类似，不同之处在于这个对话框提供一个问号图标，并且其显示的按钮是“是”和“否”
+
+  - 显示warning对话框
+
+    ```
+    StandardButton warning(QWidget * parent, const QString & title, 
+    			const QString & text, StandardButtons buttons = Ok, 
+    			StandardButton defaultButton = NoButton)
+    ```
+
+    - 与QMessageBox::critical()类似，不同之处在于这个对话框提供一个黄色叹号图标
+
+
+- 标准文件对话框QFileDialog
+
+  ```
+  QString getOpenFileName(QWidget * parent = 0,const QString & caption = QString(),
+  		 	const QString & dir = QString(),const QString & filter = QString(),
+  			QString * selectedFilter = 0,Options options = 0)
+  --parent：	父窗口
+  --caption：	对话框标题
+  --dir：		对话框打开时的默认目录
+  --filter：	过滤器
+  --selectedFilter：	默认选择的过滤器
+  --options：	对话框的一些参数设定
+  返回值：
+  	选择的文件路径
+  ```
+
+## QVariant类
+
+> QVariant这个类型充当着最常见的数据类型的联合
+
+- 对于QVariant支持的类型，可直接赋值
+
+  ```
+  QVariant var;
+  var.setValue(12);
+  int data=var.toInt();
+  ```
+
+- 对于QVariant不支持的类型
+
+  - QVariant也可以支持自定义的数据类型，需要使用Q_DECLARE_METATYPE()宏
+
+  - 存储
+
+    ```
+    QVariant::fromValue(const T &value);
+    void QVariant::setValue(const T &value);
+    ```
+
+  - 获取
+
+    ```
+    T QVariant::value() const
+    ```
+
+## JSON 常用类
+
+- QJsonDocument 类
+
+  > 类用于读和写 JSON 文档
+
+  -  JSON 文档可以使用 `QJsonDocument::fromJson()` 从基于文本的表示转化为 QJsonDocument，`toJson() `则可以反向转化为文本
+
+  - 如果要查询一个 JSON 文档是否包含一个数组或一个对象，使用 `isArray()` 和 `isObject()`
+
+- QJsonArray 类
+
+  > 封装了一个 JSON 数组
+
+  - 一个 QJsonArray 可以和一个 QVariantList 相互转换
+  - 可以使用 size() 来查询条目的数量，通过 insert() 在指定索引处插入值，removeAt() 来删除指定索引的值
+
+- QJsonObject 类
+
+  > 封装了一个 JSON 对象
+
+  - 一个 JSON 对象是一个“key/value 对”列表，key 是独一无二的字符串，value 由一个 QJsonValue 表示
+  - 一个 QJsonObject 可以和一个 QVariantMap 相互转换
+  - 可以使用 size() 来查询“key/value 对”的数量，通过 insert() 插入“key/value 对”， remove() 删除指定的 key
+
+- QJsonValue 类
+
+  > 封装了一个值
+
+  - 值的类型可以通过 type() 或 isBool()、isString() 等访问函数查询
+  - 值可以通过 toBool()、toString() 等函数转化成相应的存储类型
+
+- QJsonParseError 类
+
+  > 用于在 JSON 解析中报告错误
+
+## 控件类
+
+### 1 QListWidget
+
+- 添加一项或多项内容：
+
+  ```
+  void addItem ( const QString & label )
+  void addItem ( QListWidgetItem * item )
+  void addItems ( const QStringList & labels )
+  ```
+
+- 插入新项到列表框
+
+  ```
+  void insertItem ( int row, QListWidgetItem * item )
+  void insertItem ( int row, const QString & label )
+  void insertItems ( int row, const QStringList & labels )
+  ```
+
+- 包含隐藏的列表项在内的列表项总数：`int count () const`
+
+- 删除第row行的项：`QListWidgetItem *takeItem(int row)`
+
+- 返回当前选择的项的序号：`int currentRow () const`
+
+## 2 QTableWidget
+
+- 禁止编辑表格：`ui.qtablewidget->setEditTriggers(QAbstractItemView::NoEditTriggers)`
+
+- 设置表格为选择整行: `ui.qtablewidget->setSelectionBehavior(QAbstractItemView::SelectRows)`
+
+- 表格表头的显示与隐藏
+
+  ```
+  ui.qtablewidget->verticalHeader()->setVisible(true)
+  ui.qtablewidget->horizontalHeader()->setVisible(false)
+  ```
+
+- 设置显示网格：`ui.qtablewidget->setShowGrid(true)`
+
+- 获取某一单元格的内容：``ui.qtablewidget->item(row,column)->text()`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

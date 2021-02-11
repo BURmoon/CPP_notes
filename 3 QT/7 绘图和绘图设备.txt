@@ -1,0 +1,47 @@
+## 绘图系统
+
+- Qt 的绘图系统允许使用相同的 API 在屏幕和其它打印设备上进行绘制
+- 整个绘图系统基于QPainter，QPainterDevice和QPaintEngine三个类
+  - QPainter用来执行绘制的操作
+  - QPaintDevice是一个二维空间的抽象，是QPainter工作的空间
+  - QPaintEngine提供了画笔（QPainter）在不同的设备上进行绘制的统一的接口
+
+## 绘图设备
+
+- 绘图设备是指继承QPainterDevice的子类
+
+  - QPixmap专门为图像在屏幕上的显示做了优化
+  - QBitmap是QPixmap的一个子类，它的色深限定为1
+  - QImage专门为图像的像素级访问做了优化
+  - QPicture则可以记录和重现QPainter的各条命令
+
+- QImage与QPixmap之间的转换
+
+  - QImage转QPixmap，使用QPixmap的静态成员函数: fromImage()
+
+    `QPixmap fromImage(const QImage & image, Qt::ImageConversionFlags flags = Qt::AutoColor)`
+
+  - QPixmap转QImage，使用QPixmap类的成员函数: toImage()
+
+    `-QImage toImage() const`
+
+- QPixmap
+
+  - QPixmap继承了QPaintDevice，可以使用QPainter直接在上面绘制图形
+  - QPixmap也可以接受一个字符串作为一个文件的路径来显示这个文件
+  - 使用QPainter的drawPixmap()函数可以把文件绘制到一个QLabel、QPushButton或者其他的设备上面
+
+- QBitmap
+
+  - QBitmap继承自QPixmap，因此具有QPixmap的所有特性，提供单色图像
+  - QBitmap实际上是只有黑白两色的图像数据
+
+- QImage
+
+  - QImage能够在不同系统之上提供一个一致的显示形式
+
+- QPicture
+
+  - 可以记录和重现QPainter命令的绘图设备
+  - QPicture将QPainter的命令序列化到一个IO设备，保存为一个平台独立的文件格式
+

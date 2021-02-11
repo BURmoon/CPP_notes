@@ -1,0 +1,106 @@
+## 信号槽
+
+> 实际就是观察者模式：当发生了感兴趣的事件，某一个操作就会被自动触发
+
+- 概述
+
+  - 当某个事件发生之后(按钮检测到被点击)它就会发出一个信号（signal）
+
+    - 这种发出是没有目的的，类似广播
+
+  - 如果有对象对这个信号感兴趣，它就会使用连接（connect）函数
+
+    - 将想要处理的信号和自己的一个函数（称为槽（slot））绑定来处理这个信号
+
+      即当信号发出时，被连接的槽函数会自动被回调
+
+- 系统自带的信号和槽
+
+  ```
+  connect(sender, signal, receiver, slot);
+  --sender：	发出信号的对象
+  --signal：	发送对象发出的信号
+  --receiver：	接收信号的对象
+  --slot：		接收对象在接收到信号之后所需要调用的函数（槽函数）
+  ```
+
+  - 示例
+
+    ```
+    QPushButton * quitBtn = new QPushButton("关闭窗口",this);
+    connect(quitBtn, &QPushButton::clicked, this, &MyWidget::close);
+    ```
+
+- 自定义信号和槽
+
+  - 发送者和接收者都需要是QObject的子类（槽函数是全局函数、Lambda 表达式等无需接收者的时候除外）
+
+    信号和槽函数返回值是 void
+
+    信号只需要声明，不需要实现，槽函数需要声明也需要实现
+
+    使用 emit 在恰当的位置发送信号
+
+    使用connect()函数连接信号和槽
+
+  - 任何成员函数、static 函数、全局函数和 Lambda 表达式都可以作为槽函数
+
+    信号槽要求信号和槽的参数一致，要求的是参数类型一致
+
+    允许槽函数的参数可以比信号的少，但槽函数存在的那些参数的顺序也必须和信号的前面几个一致
+
+  - 示例
+
+    ```
+    教师类
+    	signals:
+    		void hungury();	//声明信号
+    学生类
+    	public slots:
+    		void treat();	//声明槽 
+    	//自定义槽函数 实现
+    	void Student::treat()
+    	{
+    		qDebug() << "吃饭";
+    	}
+    窗口类
+    	//声明一个函数，调用会触发教师类的hungury()信号，而响应学生类的槽函数treat()
+    	void MyWidget::ClassIsOver()
+    	{
+    		emit teacher->hungury();	 //发送信号
+    	}
+    	//在窗口中连接信号槽
+    	teacher = new Teacher(this);
+    	student = new Student(this);
+    	connect(teacher,&Teacher::hungury,student,&Student::treat);
+    	
+    //调用 ClassIsOver() 函数，测试打印出 “吃饭”
+    ClassIsOver();
+    ```
+
+  - 自定义的信号重载
+
+    - 自定义的信号 hungry() 带参数，需要提供重载的自定义信号和自定义槽
+
+      ```
+      void hungury(QString name);  	//自定义信号
+      void treat(QString name );		//自定义槽
+      ```
+
+    - 有两个重名的自定义信号和槽，直接连接会报错，所以需要利用函数指针来指向函数地址
+
+      ```
+      void (Teacher:: * teacherSingal)(QString) = &Teacher::hungury;
+      void (Student:: * studentSlot)(QString) = &Student::treat;
+      connect(teacher,teacherSingal,student,studentSlot);
+      ```
+
+- 信号槽的拓展
+
+  - 一个信号可以和多个槽相连，但是它们的调用顺序是不确定的
+  - 多个信号可以连接到一个槽，只要任意一个信号发出，这个槽就会被调用
+  - 一个信号可以连接到另外的一个信号
+  - 槽可以被取消链接，当一个对象delete之后，Qt自动取消所有连接到这个对象上面的槽
+  - 信号槽可以断开，利用disconnect关键字是可以断开信号槽的
+  - 在连接信号和槽的时候，槽函数可以使用Lambda表达式的方式进行处理
+

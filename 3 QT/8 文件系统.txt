@@ -1,0 +1,22 @@
+## 基本文件操作
+
+- QFile提供了从文件中读取和写入数据的能力
+
+  QFile需要使用 / 作为文件分隔符
+
+  - 使用QDataStream或QTextStream类来读写文件
+  - 可以使用QIODevice类提供的read()、readLine()、readAll()以及write()这样的函数读写文件
+  - 通过QFileInfo获取，有关文件本身的信息，比如文件名、文件所在目录的名字等
+
+- QFileInfo
+  - isDir()			检查该文件是否是目录
+  - isExecutable()		检查该文件是否是可执行文件等
+  - baseName()		可以直接获得文件名
+  - completeBaseName() 	获取完整的文件名
+  - suffix()			则直接获取文件后缀名
+  - completeSuffix() 		获取完整的文件后缀
+- 二进制文件读写
+  - QDataStream提供了基于QIODevice的二进制数据的序列化
+- 文本文件读写
+  - 使用QTextStream类，QTextStream和QDataStream的使用类似，只不过它是操作纯文本文件的
+
