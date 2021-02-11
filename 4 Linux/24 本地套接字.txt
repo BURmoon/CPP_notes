@@ -1,0 +1,109 @@
+## 1 本地套接字
+
+```
+int socket(int domain, int type, int protocol); 
+--domain：AF_INET --> AF_UNIX/AF_LOCAL
+--type: SOCK_STREAM/SOCK_DGRAM  都可以
+```
+
+- 地址结构
+
+  - sockaddr_in --> sockaddr_un
+
+    `struct sockaddr_in srv_addr; 	--> 	struct sockaddr_un srv_adrr;`
+
+  - `struct sockaddr_in srv_addr; 	--> 	struct sockaddr_un srv_adrr;`
+
+  - `srv_addr.sin_addr.s_addr = htonl(INADDR_ANY);`
+
+    `srv_addr.sin_port = htons(8888); --> strcpy(srv_addr.sun_path, "srv.socket")`
+
+- bind函数
+
+  ```
+  unlink("srv.socket");
+  len = offsetof(struct sockaddr_un, sun_path) + strlen("srv.socket");
+  bind(fd, (struct sockaddr *)&srv_addr, len); 
+  ```
+
+  - bind()函数调用成功，会创建一个socket
+
+    因此为保证bind成功，需要bind()之前，使用`unlink("srv.socket");`
+
+  - 客户端不能依赖 “隐式绑定”，并且应该在通信建立过程中，创建且初始化2个地址结构
+
+    - 客户端地址 client_addr 进行 bind()
+    - 服务端地址 server_addr 进行 connect();
+
+## 2 本地套接字实现
+
+- server
+
+  ```
+  lfd = socket(AF_UNIX, SOCK_STREAM, 0);
+  struct sockaddr_un serv_addr, clie_addr;
+  serv_addr.sun_family = AF_UNIX;	
+  strcpy（serv_addr.sun_path, "server套接字文件名"）
+  len = offsetof(sockaddr_un, sun_path) + strlen();				
+  unlink("套接字文件名");
+  bind(lfd, (struct sockaddr *)&serv_addr, len);  
+  Listen(lfd, 128);
+  cfd = Accept(lfd, ()&clie_addr, &len); 
+  ```
+
+- client
+
+  ```
+  lfd = socket(AF_UNIX, SOCK_STREAM, 0);
+  struct sockaddr_un clie_addr;
+  clie_addr.sun_family = AF_UNIX;
+  strcpy（clie_addr.sun_path, "client套接字文件名"）
+  len = offsetof(sockaddr_un, sun_path) + strlen();
+  unlink( "client套接字文件名");
+  bind(lfd, (struct sockaddr *)&clie_addr, len);
+  bzero() ---- struct sockaddr_un serv_addr;
+  serv_addr.sun_family = AF_UNIX;									strcpy（serv_addr.sun_path, "server套接字文件名"）
+  len = offsetof(sockaddr_un, sun_path) + strlen();
+  connect(lfd, &serv_addr, len);
+  ```
+
+  
+
+
+
+
+
+
+
+
+
+```
+
+=============================本地套接字实现=============================
+	server：lfd = socket(AF_UNIX, SOCK_STREAM, 0);
+		bzero() ---- struct sockaddr_un serv_addr, clie_addr;
+		serv_addr.sun_family = AF_UNIX;	
+		strcpy（serv_addr.sun_path, "server套接字文件名"）
+		len = offsetof(sockaddr_un, sun_path) + strlen();				
+		unlink("套接字文件名");
+		bind(lfd, (struct sockaddr *)&serv_addr, len);  
+		Listen(lfd, 128);
+
+		cfd = Accept(lfd, ()&clie_addr, &len);  
+--------------------------------------------------				
+
+	client：lfd = socket(AF_UNIX, SOCK_STREAM, 0);
+		bzero() ---- struct sockaddr_un clie_addr;
+		clie_addr.sun_family = AF_UNIX;
+		strcpy（clie_addr.sun_path, "client套接字文件名"）
+		len = offsetof(sockaddr_un, sun_path) + strlen();
+		unlink( "client套接字文件名");
+		bind(lfd, (struct sockaddr *)&clie_addr, len);
+		bzero() ---- struct sockaddr_un serv_addr;
+		serv_addr.sun_family = AF_UNIX;									strcpy（serv_addr.sun_path, "server套接字文件名"）
+		len = offsetof(sockaddr_un, sun_path) + strlen();
+		connect(lfd, &serv_addr, len);
+
+=============================本地套接字实现=============================
+```
+

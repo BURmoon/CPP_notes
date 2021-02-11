@@ -1,0 +1,66 @@
+## 1 条件变量概述
+
+- 条件本身不是锁，但它也可以造成线程阻塞
+
+  通常与互斥锁配合使用
+
+- 条件变量的两个动作
+
+  - 条件不满足, 阻塞线程
+  - 条件满足, 通知阻塞的线程解除阻塞, 开始工作
+
+## 2 条件变量相关函数
+
+- 定义一个条件变量
+
+  ```
+  pthread_cond_t cond;
+  ```
+
+- 初始化条件变量
+
+  ```
+  int pthread_cond_init(pthread_cond_t *restrict cond,
+  			const pthread_condattr_t *restrict attr);
+  --cond: 条件变量
+  --attr: 条件变量属性, 通常传NULL
+  函数返回值:
+  	成功返回0
+  	失败返回错误号
+  ```
+
+- 销毁条件变量
+
+  ```
+  int pthread_cond_destroy(pthread_cond_t *cond);
+  --cond: 条件变量
+  函数返回值
+  	成功：返回0
+  	失败：返回错误号
+  ```
+
+- 阻塞条件变量
+
+  ```
+  int pthread_cond_wait(pthread_cond_t *restrict cond,
+  			pthread_mutex_t *restrict mutex);
+  --cond: 条件变量
+  --mutex: 互斥锁变量
+  函数返回值
+  	成功：返回0
+  	失败：返回错误号
+  ```
+
+  - 条件不满足，引起线程阻塞，并解锁
+  - 条件满足，解除线程阻塞，并加锁
+
+- 唤醒至少一个阻塞在该条件变量上的线程
+
+  ```
+  int pthread_cond_signal(pthread_cond_t *cond);
+  --cond: 条件变量
+  函数返回值
+  	成功：返回0
+  	失败：返回错误号
+  ```
+

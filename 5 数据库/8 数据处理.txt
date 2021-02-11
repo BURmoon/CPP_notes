@@ -1,0 +1,78 @@
+## 1 SQL语言的类型
+
+- DML语句
+
+  > Data Manipulation Language 数据操纵语言
+
+  - 指代：insert、update、delete、select这四个操作（增删改查）
+
+- DDL语句
+
+  > Data Definition Language 数据定义语言
+
+  - truncate table(截断/清空 一张表)、create table(表)、create view(视图)、create index(索引)、
+
+    create sequence(序列)、create synonym(同义词)、alter table、drop table
+
+- DCL语句
+
+  > Data Control Language 数据控制语言
+
+  - commit(提交)、rollback(回滚)
+
+## 2 插入数据 insert
+
+> 使用 INSERT 语句向表中插入数据
+>
+> 语法：INSERT INTO  table [(column [, column...])] VALUES  (value [, value...]);
+
+- 如果values后面的值，涵盖了表中的所有列，那么table的列名可以省略不写
+
+- 没有写出的列自动填NULL, 这种方式称之为“隐式插入空值”
+
+- 插入的时候没有插入所有的列，就必须显式的写出这些列的名字
+
+  显示插入空值：`insert into emp(empno, ename, sal) values(1003, 'Jim', null);`
+
+- 可以在DML的任意一个语句中输入“&”
+
+  `select empno, ename, sal, &t  from emp`
+
+  - 在insert语句中使用&可以让用户输入值
+
+    `insert into emp(empno, ename, sal, deptno) values(&empno, &ename, &sal, &deptno)`
+
+  - 修改t的值，可以查看不同表
+
+    `select * from &t`
+
+- 批处理
+
+  > 一次插入多条数据
+
+  - 案例：一次性将emp表中的指定列插入到表emp10中
+
+    `insert into emp10(empno, ename, sal, deptno) select empno, ename, sal, deptno from emp where deptno=10`
+
+## 3 更新数据 update
+
+> 对于更新操作来说，一般会有一个“where”条件，如果没有这限制条件，更新的就是整张表
+>
+> 语法：update 表名 set col=值 where condtion
+
+- `update emp10 set sal=4000, comm=300 where ename = 'CLARK'`
+
+## 4 删除数据 delete
+
+> 语法：delete from 表名 where condtion
+
+- delete 和 truncate的区别
+  - delete 逐条删除表“内容”，truncate 先摧毁表再重建
+  - delete 是DML语句，truncate 是DDL语句
+    - DML语句可以闪回(flashback)，DDL语句不可以闪回
+  - delete不会释放空间，truncate 会释放空间
+  - delete会产生碎片，truncate不会产生碎片
+  - delete可以回滚rollback，truncate不可以回滚rollback
+
+
+

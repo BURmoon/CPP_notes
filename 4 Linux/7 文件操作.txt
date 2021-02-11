@@ -1,0 +1,225 @@
+## 1 文件描述符
+
+- 文件操作
+
+  - 使用fopen函数打开一个文件，返回一个FILE* fp，指针指向的结构体有三个重要的成员
+    - 文件描述符：通过文件描述可以找到文件的inode，通过inode可以找到对应的数据块
+    - 文件指针：读和写共享一个文件指针，读或者写都会引起文件指针的变化
+    - 文件缓冲区：读或者写会先通过文件缓冲区，提高读写磁盘的效率
+
+- 默认文件描述符
+
+  ```
+  #define  STDIN_FILENO 	0
+  #define  STDOUT_FILENO	1
+  #define  STDERR_FILENO	2
+  ```
+
+
+## 2 文件相关函数
+
+- 打开或者新建一个文件
+
+  ```
+  int open(const char *pathname, int flags);
+  int open(const char *pathname, int flags, mode_t mode);
+  --pathname：打开或创建的文件名，相对路径或绝对路径
+  --flags：
+  	O_RDONLY 只读打开、O_WRONLY 只写打开、O_RDWR 可读可写打开
+  	O_CREAT：若此文件不存在则创建它，需要mode来表示该文件的访问权限
+  	O_EXCL：如果同时指定了O_CREAT,并且文件已存在,则出错返回
+  	O_TRUNC：如果文件已存在, 将其长度截断为为0字节
+  	O_NONBLOCK：对于设备文件, 以O_NONBLOCK方式打开可以做非阻塞
+  函数返回值
+  	成功：返回一个最小且未被占用的文件描述符
+  	失败：返回-1, 并设置errno值
+  ```
+
+  - 创建文件，需要mode来表示该文件的访问权限
+
+    文件最终权限：mode & ~umask
+
+- 关闭文件
+
+  ```
+  int close(int fd);
+  --fd：文件描述符
+  函数返回值
+  	成功：0
+  	失败：-1, 并设置errno值
+  ```
+
+  - 当一个进程终止时, 内核对该进程所有尚未关闭的文件描述符调用close关闭
+
+- 从打开的设备或文件中读取数据
+
+  ```
+  ssize_t read(int fd, void *buf, size_t count);
+  --fd：文件描述符
+  --buf：读上来的数据保存在缓冲区buf中
+  --count：buf缓冲区存放的最大字节数
+  函数返回值
+  	>0：读取到的字节数
+  	=0：文件读取完毕
+  	-1：出错，并设置errno
+  ```
+
+  - 函数返回-1，设置errno
+    - errno = EAGAIN or EWOULDBLOCK 	--设置了非阻塞方式读,没有数据到达
+    - errno = EINTR		--慢速系统调用被中断
+    - errno = ECONNRESET	--说明连接被重置,需要 close()移除监听队列
+    - errno = "其他情况"		--异常
+  - 阻塞和非阻塞不是read函数的属性, 而是文件本身的属性
+    - socket，pipe这两种文件都是阻塞的
+
+- 向打开的设备或文件中写数据
+
+  ```
+  ssize_t write(int fd, const void *buf, size_t count);
+  --fd：文件描述符
+  --buf：缓冲区，要写入文件或设备的数据
+  --count：buf中数据的长度
+  函数返回值
+  	成功：写入的字节数
+  	错误：-1，并设置errno
+  ```
+
+- 移动文件指针
+
+  > #include <unistd.h>
+  >
+  > 即改变文件的文件偏移量cfo
+  >
+  > ```
+  > off_t lseek(int fd, off_t offset, int whence);
+  > --fd：文件描述符
+  > --offset：
+  > --whence：
+  > 	SEEK_SET，文件偏移量将设置为 offset
+  > 	SEEK_CUR，文件偏移量将被设置为 cfo 加上 offset
+  > 	SEEK_END，文件偏移量将被设置为文件长度加上 offset
+  > 函数返回值
+  > 	成功：若lseek成功执行, 则返回新的偏移量
+  > ```
+
+  - lseek函数常用的操作
+
+    - 文件指针移动到头部
+
+      `lseek(fd, 0, SEEK_SET);`
+
+    - 获取文件指针当前位置
+
+      `int len = lseek(fd, 0, SEEK_CUR);`
+
+    - 获取文件长度
+
+      `int len = lseek(fd, 0, SEEK_END);`
+
+    - 实现文件拓展
+
+      ```
+      off_t currpos = lseek(fd, 1000, SEEK_END); 		// 从文件尾部开始向后拓展1000个字节
+      write(fd, “a”, 1);		// 额外执行一次写操作，否则文件无法完成拓展，数据随便写
+      ```
+
+- 获取文件属性
+
+  ```
+  int stat(const char *pathname, struct stat *buf);
+  int lstat(const char *pathname, struct stat *buf);
+  --buf：传出参数
+  函数返回值
+  	成功：0
+  	失败：-1
+  ```
+
+  - stat函数和lstat函数的区别
+
+    - 对于普通文件，这两个函数没有区别, 是一样的
+
+    - 对于连接文件
+
+      调用lstat函数获取的是链接文件本身的属性信息
+
+      而stat函数获取的是链接文件指向的文件的属性信息
+
+- 打开一个目录
+
+  ```
+  DIR *opendir(const char *name);
+  --name：要遍历的目录(相对路径或者绝对路径)
+  函数返回值
+  	成功：指向目录的指针
+  ```
+
+  - 读取目录内容
+
+    ```
+    DIR *pDir = opendir(“dir”);   	//打开目录
+    while((p=readdir(pDir))!=NULL){}  	//循环读取文件
+    closedir(pDir);  			//关闭目录
+    ```
+
+- 读取目录内容(目录项)
+
+  ```
+  struct dirent *readdir(DIR *dirp);
+  --dirp：opendir
+  函数返回值
+  	成功：读取的目录项指针
+  ```
+
+- 复制文件描述符
+
+  ```
+  int dup(int oldfd);
+  --oldfd：要复制的文件描述符
+  函数返回值
+  	成功: 返回最小且没被占用的文件描述符
+  	失败: 返回-1, 设置errno值
+  ```
+
+  ```
+  int dup2(int oldfd, int newfd);
+  --oldfd：原来的文件描述符
+  --newfd：复制成的新的文件描述符
+  函数返回值
+  	成功: 将oldfd复制给newfd, 两个文件描述符指向同一个文件
+  	失败: 返回-1, 设置errno值
+  ```
+
+  - 假设newfd已经指向了一个文件，首先close原来打开的文件，然后newfd指向oldfd指向的文件
+  - 若newfd没有被占用，newfd指向oldfd指向的文件
+
+- 改变已经打开的文件的属性
+
+  ```
+  int fcntl(int fd, int cmd, ... /* arg */ );
+  --若cmd为 F_DUPFD, 复制文件描述符, 与dup相同
+  --若cmd为 F_GETFL, 获取文件描述符的flag属性值
+  --若cmd为 F_SETFL, 设置文件描述符的flag属性
+  函数返回值
+  	若cmd为F_DUPFD, 返回一个新的文件描述符
+  	若cmd为F_GETFL, 返回文件描述符的flags值
+  	若cmd为 F_SETFL, 返回0
+  ```
+
+  - fcntl函数常用的操作
+
+    - 复制一个新的文件描述符
+
+      `int newfd = fcntl(fd, F_DUPFD, 0);`
+
+    - 获取文件的属性标志
+
+      `int flag = fcntl(fd, F_GETFL, 0);`
+
+    - 设置文件状态标志
+
+      ```
+      int flag = fcntl(fd, F_GETFL, 0)；
+      flag = flag | O_APPEND;
+      fcntl(fd, F_SETFL, flag);
+      ```
+

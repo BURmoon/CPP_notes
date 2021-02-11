@@ -1,0 +1,100 @@
+## 1 网络字节序
+
+- 网络数据流的地址规定：先发出的数据是低地址，后发出的数据是高地址
+
+- TCP/IP 协议规定，网络数据流应采用大端字节序，即低地址高字节
+
+  - 小端法（本地存储）：高位存高地址，低位存低地址
+  - 大端法（网络存储）：高位存低地址，低位存高地址
+
+- 网络字节序和主机字节序的转换
+
+  > h表示host，n表示network，l表示32位长整数，s表示16位短整数
+
+  - 本地 IP 转网络
+
+    `uint32_t htonl(uint32_t hostlong);`
+
+  - 本地 port 转网络
+
+    `uint16_t htons(uint16_t hostshort);`
+
+  - 网络 IP 转本地
+
+    `uint32_t ntohl(uint32_t netlong);`
+
+  - 网络 port 转本地
+
+    `uint16_t ntohs(uint16_t netshort);`
+
+## 2 IP地址转换函数
+
+> #include <arpa/inet.h>
+
+- 本地IP转网络IP
+
+  ```
+  int inet_pton(int af, const char *src, void *dst);
+  --af：AF_INET、AF_INET6
+  --src：传入参数，IP地址（点分十进制）
+  --dst：传出参数，转换后的网络字节序的IP地址
+  返回值：
+  	成功： 1
+  	异常： 0， 说明src指向的不是一个有效的ip地址
+  	失败：-1
+  ```
+
+- 网络IP转本地IP
+
+  ```
+  const char *inet_ntop(int af, const void *src, char *dst, socklen_t size);
+  --af：AF_INET、AF_INET6
+  --src：网络字节序IP地址
+  --dst：本地字节序(string IP)
+  --size：dst的大小
+  返回值： 	
+  	成功：dst	
+  	失败：NULL
+  ```
+
+- sockaddr地址结构
+
+  ```
+  struct sockaddr_in {
+  	__kernel_sa_family_t	sin_family; 	//地址结构类型
+  	__be16		sin_port;						//端口号
+  	struct in_addr		sin_addr;				//IP地址
+  };
+  struct in_addr {
+  	__be32		s_addr;
+  };
+  ```
+
+  - IP + port：在网络环境中唯一标识一个进程
+
+  - sockaddr地址应用
+
+    ```
+    struct sockaddr_in addr;
+    bzero(&addr, sizeof(addr));
+    addr.sin_family = AF_INET/AF_INET6			
+    ddr.sin_port = htons(9527);
+    addr.sin_addr.s_addr = htonl(INADDR_ANY);
+    或 inet_pton(AF_INET, "127.0.0.1", (void *)&addr.sin_addr.s_addr);
+    ```
+    
+    - INADDR_ANY宏表示本地的任意IP地址
+    
+      这样设置可以在所有的IP地址上监听，直到与某个客户端建立了连接时才确定下来到底用哪个IP地址
+
+## 3 读取/发送数据
+
+```
+ssize_t read(int fd, void *buf, size_t count);
+ssize_t write(int fd, const void *buf, size_t count);
+ssize_t recv(int sockfd, void *buf, size_t len, int flags);
+ssize_t send(int sockfd, const void *buf, size_t len, int flags);
+```
+
+- 对应recv和send这两个函数flags可直接填0
+

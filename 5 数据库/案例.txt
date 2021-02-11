@@ -1,0 +1,113 @@
+显示当前用户	
+	SQL> show user;
+查看系统当前的日期 (注意其格式)
+	SQL> select sysdate from dual		
+获取系统当前日期格式
+	SQL> select * from v$nls_parameters
+修改日期格式
+	SQL> alter session set NLS_DATE_FORMAT = 'yyyy-mm-dd '
+查看当前用户下的表	
+	SQL> select * from tab
+查看员工表的结构
+	SQL> desc emp
+查询所有员工的所有记录
+	SQL> select * from emp
+
+
+查询员工号、姓名、薪水
+	SQL> select empno, ename, sal from emp
+重复记录只取一次
+	SQL> select DISTINCT deptno from emp
+查询: 员工号、姓名、月薪、年薪、奖金、年收入
+	SQL> select deptno, ename, sal, sal * 12, comm, sal * 12 + nvl(comm, 0) from emp
+查询奖金为NULL的员工信息
+	SQL> select * from emp where comm is NULL
+显示一个“hello world”
+	SQL> select concat('hello', ' world') as "你好" from dual
+	SQL> select 'hello' || ' world' || ' Oracle' as "你好" from dual
+
+查询10号部门的员工信息
+	SQL> select * from emp where deptno=10
+查询入职日期为1981年11月17日的员工
+	SQL> select * from emp where hiredate= '17-11月-81 '
+查询工资在1000-2000之间的员工
+	SQL> select * from emp where sal >=1000 and sal<2000
+	SQL> select * from emp where sal between 1000 and 2000
+查询部门号为10和20的员工信息
+	SQL> select * from emp where deptno=10 or deptno=20 
+	SQL> select * from emp where deptno in (10, 20) 
+查询名字以S开头的员工
+	SQL> select * from emp where ename like 'S% '
+查询名字是4个字的员工
+	SQL> select * from emp where ename like '_ _ _ _'
+查询名字中包含_的员工
+	SQL> select * from emp where ename like '%\_% ' escape '\'
+查询员工信息，按月薪排序
+	SQL>  select * from emp order by sal
+查询员工信息， 按奖金由高到低排序，将空值放在最后
+	SQL> select * from emp order by comm desc nulls last
+
+总裁(PRESIDENT)涨1000，经理(MANAGER)涨800，其他人涨400. 请将涨前，涨后的薪水列出
+	SQL> select ename, job, sal 涨前薪水, 
+		case job 
+		when 'PRESIDENT' then sal+1000 
+		when 'MANAGER' then sal+800 
+		else sal + 400
+		end 涨后薪水 
+		from emp  
+	SQL> select ename, job, sal 涨前薪水, 
+		decode(job, 'PRESIDENT', sal + 1000,  
+			'MANAGER', sal + 800,  
+			sal + 400)  as 涨后薪水
+		from emp  
+
+求员工的工资总额：					
+	SQL>  select sum(sal) from emp;	sum() 对指定列的各行求和。
+员工人数：							
+	SQL>  select count(*) from emp;	count() 统计指定列的非空行数
+求emp表中的工种：
+	SQL> select count(distinct job) from emp; 
+查询“部门”的平均工资
+	SQL> select  deptno,  avg(sal)  from emp  group by deptno;
+查询平均薪水大于2000的部门
+	SQL> select deptno, avg(sal)  from emp  group by deptno  having avg(sal)>2000;
+
+查询员工信息：员工号 姓名 月薪和部门名称
+	SQL>  select e.empno, e.ename, e.sal, d.dname  from emp e, dept d  where e.deptno=d.deptno;
+查询员工信息：员工号 姓名 月薪 和 薪水级别(salgrade表)
+	SQL> select e.empno, e.ename, e.sal, s.grade  from emp e, salgrade s  				  			where e.sal >= s.losal and e.sal <= s.hisal;
+	SQL>  select s.grade, e.empno, e.ename, e.sal, e.job  from emp e, salgrade s  
+		where e.sal between s.losal and s.hisal
+		order by 1
+按部门统计员工人数，显示如下信息： 部门号 部门名称 人数
+	SQL> select d.deptno 部门号, d.dname 部门名称, count(e.empno) 人数  from emp e, dept d
+		where e.deptno(+)=d.deptno  group by d.deptno, d.dname
+查询员工信息：xxx的老板是 yyy
+	SQL> select e.ename || ' 的老板是 ' || nvl(b.ename, '他自己' )
+		from emp e, emp b
+		where e.mgr=b.empno(+) 
+	SQL> select concat( e.ename, concat(' 的老板是 ',  nvl(b.ename, '他自己' )) )
+		from emp e,  emp b
+		where e.mgr = b.empno(+)
+
+查询工资比SCOTT高的员工信息
+	SQL> select * from emp  
+		where sal  >  (select sal from emp where ename='SCOTT')
+查询部门名称是“SALES”的员工信息
+	SQL> select * from emp  
+		where deptno= (select deptno from dept	 where dname='SALES')
+	SQL> select e.*  from emp e, dept d  where e.deptno=d.deptno and d.dname='SALES' 
+查询员工的姓名、薪水和年薪
+	SQL> select * from (select ename, sal, sal*12 年薪 from emp); 
+查询部门名称为SALES和ACCOUNTING的员工信息
+	SQL> select * from emp 
+		where deptno in (select deptno from dept where dname= 'SALES 'or dname= 'ACCOUNTING ');
+	SQL> select e.* from emp e, dept d 
+		where  e.deptno=d.deptno and (d.dname= 'SALES ' or d.dname= 'ACCOUNTING ');
+查询薪水比30号部门任意一个员工高的员工信息
+	SQL> select * from emp where sal > any (select sal from emp where deptno=30);
+	SQL> select * from emp where sal > (select min(sal) from emp where deptno=30);
+查询薪水比30号部门所有员工高的员工信息
+	SQL> Select * from emp where sal > all (select sal from emp where deptno=30);
+查询不是老板的员工信息
+	SQL>  select * from emp where empno not in (select mgr from emp where mgr is not null);

@@ -1,0 +1,42 @@
+## 1 创建表
+
+- `create table test1 (tid number, tname varchar2(20), hiredate date default sysdate)`
+
+  default的作用是：当向表中插入数据的时候, 没有指定时间的时候, 使用默认值sysdate
+
+- `create table emp10 as select * from emp where 1=2`
+
+  在这条语句中，“where 1=2”一定为假，所以是不能select到结果的
+
+  但是将这条子查询放到Create语句中，可以完成拷贝表结构的效果，最终emp10和emp有相同的结构
+
+- `create table emp20 as select * from emp where deptno=20`
+
+  如果“where”给定的是一个有效的条件，就会在创建表的同时拷贝数据，这样emp20在创建之初就有5条数据
+
+## 2 修改表
+
+- 追加一列：向test1表中加入新列 image 类型是blob
+
+  `alter table test1 add image blob`
+
+- 修改一列：将tname列的大小改为40
+
+  `alter table test1 modify tname varchar2(40)`
+
+- 删除一列：将列image删除
+
+  `alter table test1 drop column image`
+
+- 重命名一列：将列tname重命名为username
+
+  `alter table test1 rename column tname to username`
+
+## 3 删除表
+
+- `drop table testsp`
+
+## 4 重命名表
+
+- `rename test1 to test8`
+

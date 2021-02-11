@@ -1,0 +1,59 @@
+## 1 读写锁概述
+
+- 读写锁也叫共享-独占锁（写独占、读共享、写优先）
+  - 当读写锁以读模式锁住时，它是以共享模式锁住
+  - 当读写锁以写模式锁住时，它是以独占模式锁住
+
+## 2 读写锁相关函数
+
+- 定义一把读写锁
+
+  ```
+  pthread_rwlock_t rwlock;
+  ```
+
+- 初始化读写锁
+
+  ```
+  int pthread_rwlock_init(pthread_rwlock_t *restrict rwlock, 
+  			const pthread_rwlockattr_t *restrict attr);
+  --rwlock：读写锁
+  --attr：读写锁属性，传NULL为默认属性
+  ```
+
+- 销毁读写锁
+
+  ```
+  int pthread_rwlock_destroy(pthread_rwlock_t *rwlock);
+  ```
+
+- 加读锁
+
+  ```
+  int pthread_rwlock_rdlock(pthread_rwlock_t *rwlock);
+  ```
+
+- 加写锁
+
+  ```
+  int pthread_rwlock_wrlock(pthread_rwlock_t *rwlock);
+  ```
+
+- 尝试加读锁
+
+  ```
+  int pthread_rwlock_tryrdlock(pthread_rwlock_t *rwlock);
+  ```
+
+- 尝试加写锁
+
+  ```
+  int pthread_rwlock_trywrlock(pthread_rwlock_t *rwlock);
+  ```
+
+- 解锁
+
+  ```
+  int pthread_rwlock_unlock(&pthread_rwlock_t *rwlock);	
+  ```
+

@@ -1,0 +1,62 @@
+## 1 Systemd初始化进程
+
+- 启动服务
+
+  `systemctl start foo.service`
+
+- 重启服务
+
+  `systemctl restart foo.service`
+
+- 停止服务
+
+  `systemctl stop foo.service`
+
+- 重新加载配置文件（不终止服务）
+
+  `systemctl reload foo.service`
+
+- 查看服务状态
+
+  `systemctl status foo.service`
+
+- 查看特定服务是否为开机自启动
+
+  `systemctl is-enabled foo.service`
+
+## 2 用户管理
+
+- 查看当前用户	whoami
+- 设置用户密码	passwd
+- 切换用户	su
+  - `su`	切换用户，不会切换工作目录
+  - `su -`	切换到对应的用户时会将当前的工作目录自动转换到切换后的用户主目录
+- 添加、删除组账号	groupadd、groupdel
+- 添加用户账号	useradd
+  - -d \<dirname\>	指定用户登录系统时的主目录
+  - -m	自动建立目录
+  - -g	指定组名称
+- 删除用户	userdel
+  - -r：删除用户，同时删除用户的主目录
+
+## 3 系统工作命令
+
+- 重启系统	reboot
+
+- 显示及设置系统的时间或日期	date
+- 将一个前台执行的程序调入后台执行	&
+- 查看后台运行程序	jobs
+- 将后台运行程序调出到前台	fg
+- 查询某个指定服务进程的PID值	pidof
+- 终止某个指定名称的服务所对应的全部进程	killall 
+
+## 4 系统状态检测命令
+
+- 获取网卡配置与网络状态等信息	ifconfig
+- 查看系统内核与系统版本等信息	uname
+- 查看系统的负载信息	uptime
+- 显示当前系统中内存的使用量信息	free
+- 查看所有系统的登录记录	last
+
+
+
