@@ -1,0 +1,34 @@
+## 问题1
+
+- 现象
+
+  已经在c文件中包含了线程的头文件<pthread.h>，可是编译的时候却报错“对pthread_create未定义的引用
+
+- 解决
+
+  在使用pthread_create创建线程时，在编译中要加-lpthread参数
+
+  `gcc Thread_server.c -lpthread -o createThread_server`
+
+- 原因
+
+  pthread库不是Linux系统默认的库，连接时需要使用库libpthread.a
+
+## 问题2
+
+- 现象
+
+  启动服务器和客户端后能正常通信
+
+  当关闭客户端后，服务器端陷入死循环，持续打印客户端地址
+
+- 解决
+
+  添加对客户端通信关闭的处理
+
+  即当read()返回0时，服务端结束通信
+
+- 原因
+
+  未判断客户端关闭状态，即read()返回值的判断
+

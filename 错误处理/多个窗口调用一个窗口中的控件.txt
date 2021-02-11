@@ -1,0 +1,12 @@
+不管怎么样你都要获取到主窗体的实例才可以
+1 使用Appliction
+Application.OpenForms["主窗体名"].Controls["控件名"].Text = "asdf";
+
+2 使用静态变量
+public static MainForm m_Form;
+
+在主窗体加的Load里写
+m_Form=this;
+其他窗体就可以使用了
+
+3 传递参数 可以使用构造类 Form的Tag标签..如果是MDI也可以使用 MdiParent 很多种方法都可以做到.

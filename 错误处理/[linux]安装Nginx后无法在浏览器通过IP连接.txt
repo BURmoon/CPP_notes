@@ -1,0 +1,27 @@
+## 描述
+
+- 现象
+
+  在服务器成功安装Nginx后，在浏览器输入服务器IP，无法转到到Nginx的欢迎页面
+
+- 解决 (进行排错)
+
+  - Nginx是否配置正确
+
+    ./nginx/sbin/nginx -t
+
+  - Nginx是否成功启动
+
+    查看是否有Nginx的进程：`ps -ef | grep nginx`
+
+    查看是否有80端口：` netstat -anp | grep 80`
+
+  - Ping测试连通性
+
+    `ping x.x.x.x (ip地址)`
+
+  - Telnet测试端口是否可用
+
+    `telnet x.x.x.x 80`
+
+    发现80端口不可用，将防火墙关闭后，再次测试成功出现 Welcome to nginx! 提示

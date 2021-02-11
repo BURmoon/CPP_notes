@@ -1,0 +1,19 @@
+## 描述
+
+- 问题
+
+  /usr/lib/ld :can’t find -lmysqlclient
+
+- 解决
+
+  - 动态库文件mysqlclient没在默认路径下，需要指明动态链接库的路径 
+
+    `-L/usr/lib/mysql/ -lmysqlclient`
+
+### ldconfig指令
+
+- ldconfig 命令的用途主要是
+
+  在默认目录 (/usr/lib、/lib) 以及动态库配置文件 /etc/ld.so.conf 所列目录下搜索出可共享的动态链接库(libxxxx.so*)，进而创建出动态装入程序(ld.so)，所需的连接和缓存文件
+
+- 如果修改了/lib/或/usr/lib，安装了新的动态链接库时，一定要执行一次$ldconfig

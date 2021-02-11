@@ -1,0 +1,42 @@
+## 问题 1
+
+- 现象
+
+  在安装软件时出现错误：无法获得锁的错误
+
+- 解决
+
+  - 方案1
+
+    强制解锁：`sudo rm 无法获得锁的路径`
+
+  - 方案2
+
+    `sudo kill 该进程的PID`
+
+## 问题 2
+
+- 现象
+
+  使用yum安装软件时出现错误：`Loaded plugins: fastestmirror`
+
+- 解决
+
+  - 修改插件配置文件
+
+    `vim  /etc/yum/pluginconf.d/fastestmirror.conf`
+
+    `enabled=0   //由1改成0 ，禁用该插件`
+
+  - 修改yum配置文件
+
+    `vim /etc/yum.conf`
+
+    `9 plugins=0  //不使用插件`
+
+  - 清除缓存并重新构建yum源
+
+    `yum clean all`
+
+    `yum makecache`
+

@@ -1,0 +1,16 @@
+## 描述
+
+- 现象
+
+  MySQL中使用source导入.sql文件时出现 " failed to open file" 错误
+
+- 原因
+
+  mysql没权限读取指定导入盘符的权限 
+
+- 解决
+
+  把sql文件放在temp目录下，这个目录默认所有用户都可以读取的
+
+  - Linux：在/tmp
+  - windows：在c:/windows/temp

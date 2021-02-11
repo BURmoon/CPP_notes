@@ -1,0 +1,59 @@
+## 环境变量
+
+- 常用的环境变量
+
+  - PATH		可执行程序的搜索目录
+  - LANG		Linux系统的语言、地区、字符集
+  - SHELL		用户当前使用的Shell解析器
+  - HISTSIZE	保存历史命令的数目
+  - USER		当前登录用户的用户名
+  - HOME		当前登录用户的主目录
+  - LD_LIBRARY_PATH	C/C++语言动态链接库文件搜索的目录
+
+- PATH环境变量
+
+  > export PATH=目录1:目录2:目录3:......目录n:.
+
+  - PATH环境变量存放的是目录列表，目录之间用冒号 ':' 分隔，最后的圆点 '.' 表示当前目录
+  - 如果PATH变量中没有包含圆点 '.'，执行当前目录下的程序需要加./或使用绝对路径
+
+- LD_LIBRARY_PATH环境变量
+
+  > export LD_LIBRARY_PATH=目录1:目录2:目录3:......目录n:.
+
+  - LD_LIBRARY_PATH环境变量存放的是目录列表，目录之间用冒号:分隔，最后的圆点.表示当前目录
+
+## 设置环境变量
+
+> 环境变量脚本文件的执行顺序：
+>
+> ​	/etc/profile->/etc/profile.d->/etc/bashrc->用户的.bash_profile->用户的.bashrc
+
+- `export 变量名='值'`
+
+  示例：`export PATH=$PATH:$HOME/bin:$ORACLE_HOME/bin:.`
+
+  - 如果环境变量的值没有空格等特殊符号，可以不用单引号包含
+  - 采用export设置的环境变量，在退出Shell后就会失效
+
+- 设置系统环境变量
+  - 在/etc/profile文件中设置
+    - Linux不建议在/etc/profile文件中设置系统环境变量
+  - 在/etc/profile.d目录中增加环境变量脚本文件
+    - /etc/profile在每次启动时会执行 /etc/profile.d下全部的脚本文件
+  - 在/etc/bashrc文件中设置环境变量
+    - 该文件配置的环境变量将会影响全部用户使用的bash shell
+- 设置用户环境变量
+  - .bash_profile
+    - 当用户登录时执行，每个用户都可以使用该文件来配置专属于自己的环境变量
+  - .bashrc
+    - 当用户登录时以及每次打开新的Shell时该文件都将被读取
+    - 每开一个Shell该文件都会被读取一次,效率受影响
+  - .bash_logout
+    - 当每次退出系统（退出bash shell）时执行该文件
+
+## 环境变量的生效
+
+- 在Shell下，用export设置的环境变量对当前Shell立即生效，Shell退出后失效
+- 在脚本文件中设置的环境变量不会立即生效，退出Shell后重新登录时才生效，或者用source命令让它立即生效：`source /etc/profile`
+

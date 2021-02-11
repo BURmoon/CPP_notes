@@ -1,0 +1,30 @@
+- 将共享库路径加入到LD_LIBRARY_PATH环境变量
+
+  - 临时设置LD_LIBRARY_PATH
+
+    `export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/库路径`
+
+  - 永久设置(当前用户生效)
+
+    将`export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/库路径`，添加到 ~/.bashrc或~/.bash_profile中
+
+    执行`source .bashrc`配置文件生效 
+
+  - 永久设置(所有用户生效)
+
+    将`export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/库路径`，添加到 /etc/profile
+
+    保存之后使用source执行该文件
+
+- 添加到/etc/ld.so.conf
+
+  在/etc/ld.so.conf文件结尾添加入库文件所在目录的路径
+
+  保存之后运行`sudo ldconfig -v`，重建/etc/ld.so.cache文件
+
+- 拷贝共享库放入到/lib或usr/lib下
+
+- Makefile
+
+  在Makefile中使用-Wl,-rpath来指定动态路径，直接将共享库以–l方式显示加载进来
+

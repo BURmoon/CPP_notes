@@ -1,0 +1,15 @@
+## 描述
+
+- 问题
+
+  ERROR server: 192.168.1.22:22122, response status 28 != 0以及2 != 0
+
+- 解决
+
+  - `pkill -9 fdfs`
+
+  - 重新加载配置文件启动
+
+    `/usr/bin/fdfs_trackerd start /etc/fdfs/tracker.conf`
+
+    `/usr/bin/fdfs_storaged start /etc/fdfs/storage.conf`

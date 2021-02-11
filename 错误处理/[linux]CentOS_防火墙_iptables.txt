@@ -1,0 +1,63 @@
+## 防火墙
+
+> 防火墙会从上至下的顺序来读取配置的策略规则
+>
+> 在找到匹配项后就立即结束匹配工作并去执行匹配项中定义的行为（即放行或阻止）
+>
+> 如果在读取完所有的策略规则之后没有匹配项，就去执行默认的策略
+
+### 规则链
+
+- 规则链：iptables服务把用于处理或过滤流量的策略条目称之为规则，多条规则可以组成一个规则链
+- 分类依据：规则链则依据数据包处理位置的不同进行分类
+  - PREROUTING	在进行路由选择前处理数据包
+  - INPUT		处理流入的数据包
+  - OUTPUT		处理流出的数据包
+  - FORWARD		处理转发的数据包
+  - POSTROUTING	在进行路由选择后处理数据包
+
+- 处理动作
+
+  - ACCEPT（允许流量通过）、REJECT（拒绝流量通过）、LOG（记录日志信息）、DROP（拒绝流量通过）
+
+  - REJECT和DROP的不同点
+
+    就DROP来说，它是直接将流量丢弃而且不响应
+
+    REJECT则会在拒绝流量后再回复一条信息，从而让流量发送方清晰地看到数据被拒绝的响应信息
+
+### 命令
+
+- 基本命令
+
+  - iptables -F	清空已有的防火墙规则链
+  - iptables -L	查看已有的防火墙规则链
+  - iptables -P INPUT DROP	把INPUT规则链的默认策略设置为拒绝
+  - service iptables save	保存命令，让配置的防火墙策略永久生效
+
+- 其它常用命令
+
+  - 向INPUT链中添加允许ICMP流量进入的策略规则
+
+    `iptables -I INPUT -p icmp -j ACCEPT`
+
+  - 删除INPUT规则链中刚刚加入的那条策略（允许ICMP流量）
+
+    `iptables -D INPUT 1`
+
+  - 将INPUT规则链设置为只允许指定网段的主机访问本机的22端口，拒绝来自其他所有主机的流量
+
+    `iptables -I INPUT -s 192.168.10.0/24 -p tcp --dport 22 -j ACCEPT`
+
+  - 向INPUT规则链中添加拒绝所有人访问本机12345端口的策略规则
+
+    `iptables -I INPUT -p tcp --dport 12345 -j REJECT`
+
+  - 向INPUT规则链中添加拒绝192.168.10.5主机访问本机80端口（Web服务）的策略规则
+
+    `iptables -I INPUT -p tcp -s 192.168.10.5 --dport 80 -j REJECT`
+
+  - 向INPUT规则链中添加拒绝所有主机访问本机1000～1024端口的策略规则
+
+    `iptables -A INPUT -p tcp --dport 1000:1024 -j REJECT`
+

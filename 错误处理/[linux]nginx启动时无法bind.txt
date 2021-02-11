@@ -1,0 +1,11 @@
+## 描述
+
+- 现象
+
+  安装 nginx+fastdfs 插件后，重新启动时显示
+
+  `nginx: [emerg] bind() to 0.0.0.0:80 failed (98: Address already in use)`
+
+- 解决
+  - 关闭原来的nginx：`sudo nginx -s stop`
+  - 重新启动nginx：`sudo nginx`

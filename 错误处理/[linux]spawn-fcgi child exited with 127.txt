@@ -1,0 +1,21 @@
+## 描述
+
+- 问题
+
+  启动spawn-fcg：`spawn-fcgi -a 127.0.0.1 -p 9527 -f ./echo`
+
+  报错：`spawn-fcgi: child exited with: 127`
+
+- 原因
+
+  echo的依赖缺失，查看依赖：`ldd echo`
+
+  发现：`libfcgi.so.0 => not found`
+
+- 解决
+
+  查找库文件的位置：`find / -name libfcgi.so.0`
+
+  位于：`/usr/local/lib/libfcgi.so.0`
+
+  将库文件所在路径加入环境变量PATH中问题解决
