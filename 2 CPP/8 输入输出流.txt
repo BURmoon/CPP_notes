@@ -1,0 +1,100 @@
+## 1 流
+
+> 程序的输入：指的是从输入文件将数据传送给程序
+>
+> 程序的输出：指的是从程序将数据传送给输出文件
+
+- C++输入输出包含
+  - 对系统指定的标准设备的输入和输出，简称标准I/O
+  - 以外存磁盘文件为对象进行输入和输出，简称文件I/O
+  - 对内存中指定的空间进行输入和输出，简称串I/O
+- iostream类库的接口分别由不同的头文件来实现，包括：
+  - iostream  包含了对输入输出流进行操作所需的基本信息
+    - 在iostream头文件中定义的4种流对象
+      - cin	标准输入流
+      - cout	标准输出流
+      - cerr	标准错误流
+      - clog	标准错误流
+  - fstream  用于用户管理的文件的I/O操作
+  - strstream  用于字符串流I/O
+  - stdiostream  用于混合使用C和C++的I/O机制时
+  - iomanip  在使用格式化I/O时应包含此头文件
+
+## 2 标准I/O流
+
+### 2.1 cout流
+
+- cout流在内存中对应开辟了一个缓冲区，用来存放流中的数据
+- cout流通常是传送到显示器输出，但也可以被重定向输出到磁盘文件
+
+> 当向cout流插入一个endl时，不论缓冲区是否已满，都立即输出流中所有数据，然后插入一个换行符， 并刷新流(清空缓冲区)
+>
+> 当向cout流插入一个换行符”\n“（如`cout<<a<<"\n"`）时，则只输出和换行，而不刷新cout流
+
+### 2.2 cerr流
+
+- cerr流对象是标准错误流，cerr流已被指定为与显示器关联
+- cerr流中的信息只能在显示器输出
+
+### 2.3 clog流
+
+- clog流的作用和cerr相同，都是在终端显示器上显示出错信息
+- clog中的信息存放在缓冲区中，缓冲区满后或遇endl时向显示器输出
+
+## 3 标准输入流cin
+
+- 读取一个字符：`cin.get()`
+
+  ```
+  char char1, char2;
+  cin.get(char1).get(char2);
+  cout << char1 << " " << char2 << " ";
+  ```
+
+- 读字符串：`cin.getline()`
+
+  ```
+  char buf[1024] = { 0 };
+  cin.getline(buf,1024);
+  cout << buf;
+  ```
+
+- 忽略缓冲区当前字符：`cin.ignore()`
+
+  ```
+  cin.ignore(a,ch)
+  从输入流（cin）中提取字符，提取的字符被忽略，不被使用
+  每抛弃一个字符，它都要计数和比较字符，如果计数值达到a或者被抛弃的字符是ch，则cin.ignore()函数执行终止，否则，它继续等待
+  ```
+
+- 偷窥下缓冲区的数据：`cin.peek()`
+
+- 将数据放回缓冲区：`cin.putback()`
+
+  ```
+  char ch = cin.get();
+  cin.putback(ch);
+  ```
+
+## 4 标准输出流
+
+- 刷新缓冲区：`cout.flush()`
+
+- 向缓冲区写字符：`cout.put()`
+
+- 从buffer中写num个字节到当前输出流中：`cout.write()`
+
+## 5 格式化输出
+
+> 引入头文件：`#include< iomanip>`
+
+```
+int number = 99;
+cout << setw(20)     			//设置宽度
+<< setfill('~')					//设置填充
+<< setiosflags(ios::showbase) 	//显示基数
+<< setiosflags(ios::left)  		//设置左对齐
+<< hex   						//显示十六进制
+<< number
+```
+

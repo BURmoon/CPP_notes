@@ -1,0 +1,101 @@
+## 1 函数模板
+
+> 用模板是为了实现泛型，可以减轻编程的工作量，增强函数的重用性
+>
+> 格式：`template< typename T >`
+>
+> - 告诉编译器后面紧跟着的函数或者类中出现T，不要报错，T是一个通用的数据类型
+
+- 函数模板可以自动推导参数的类型，也可以显式指定类型
+  - 自动类型推导：必须要推导出一致的T才可以使用
+  - 显示指定类型：`mySwap<int>(a,b);`
+
+- 函数模板可以像普通函数那样可以被重载
+
+### 1.1 函数模板和普通函数区别
+
+- 函数模板不允许自动类型转化，普通函数能够自动进行类型转化
+- 函数模板和普通函数在一起调用时，c++编译器优先考虑普通函数
+  - 可以通过空模板实参列表的语法限定编译器只能通过模板匹配：`MyPlus<>(a, b)`
+
+### 1.2 模板实现机制
+
+- 编译器会对函数模板进行两次编译
+- 在声明的地方对模板代码本身进行编译，在调用的地方对参数替换后的代码进行编译
+
+## 2 类模板
+
+- 类模板用于实现类所需数据的类型参数化
+
+- 类模板的声明和实现放到一个文件中，我们把这个文件命名为.hpp
+
+  - 类模板需要二次编译，在出现模板的地方编译一次，在调用模板的地方再次编译
+  - C++编译规则为独立编译
+
+- 类模板做函数参数
+
+  - `void Func(Person<string,int>& p){}`
+
+- 类模板派生普通类
+
+  - 子类实例化的时候需要具体化的父类
+  - 子类需要知道父类的具体类型是什么样的，这样c++编译器才能知道给子类分配多少内存
+
+- 类模板派生类模板
+
+  - 继承类模板的时候，必须要确定基类的大小
+
+    `class Child2 : public Base<double>{}`
+
+## 3 实例
+
+- 类模板用于实现类所需数据的类型参数化
+
+```
+template<class NameType, class AgeType>
+class Person{
+public:
+	NameType mName;
+	AgeType mAge;
+};
+Person<string, int>P1("hello", 18);  // 类模板不能进行类型自动推导 
+```
+
+- 类模板派生普通类
+
+```
+//类模板
+template<class T>
+class MyClass{
+public:
+	MyClass(T property){
+	 this->mProperty = property;
+	}
+public:
+	T mProperty;
+};
+//普通派生类
+class SubClass : public MyClass<int>{
+public:
+	SubClass(int b) : MyClass<int>(20){
+		this->mB = b;
+	}
+public:
+	int mB;
+
+};
+```
+
+- 模板类碰到友元函数
+
+```
+//友元函数类内实现
+	friend void printPerson(Person<T1, T2> &p)
+//友元函数类外实现
+	声明： 
+	friend void printPerson2<>(Person<T1, T2> &p);
+	实现：	
+	template<class T1,class T2>
+	void printPerson2(Person<T1, T2> &p){}
+```
+

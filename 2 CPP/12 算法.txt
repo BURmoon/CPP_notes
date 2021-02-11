@@ -1,0 +1,202 @@
+1）函数对象
+	重载函数调用操作符的类，其对象常称为函数对象（function object）
+	也叫仿函数(functor),其实就是重载“()”操作符，使得类对象可以像函数那样调用
+
+	重载了()操作符的类实例化的对象，可以像普通函数那样调用,可以有参数 ，可以有返回值
+	函数对象超出了普通函数的概念，可以保存函数的调用状态
+	函数对象作为参数
+
+	谓词
+	谓词是指普通函数或重载的operator()返回值是bool类型的函数对象(仿函数)
+
+	内建函数对象
+		头文件 #include<functional>
+		算数类函数对象,关系运算类函数对象，逻辑运算类仿函数
+	算数类函数对象
+		template<class T> T plus<T>//加法仿函数
+		template<class T> T minus<T>//减法仿函数
+		template<class T> T multiplies<T>//乘法仿函数
+		template<class T> T divides<T>//除法仿函数
+		template<class T> T modulus<T>//取模仿函数
+		template<class T> T negate<T>//取反仿函数
+	关系运算类函数对象
+		template<class T> bool equal_to<T>//等于
+		template<class T> bool not_equal_to<T>//不等于
+		template<class T> bool greater<T>//大于
+		template<class T> bool greater_equal<T>//大于等于
+		template<class T> bool less<T>//小于
+		template<class T> bool less_equal<T>//小于等于
+	逻辑运算类运算函数
+		template<class T> bool logical_and<T>//逻辑与
+		template<class T> bool logical_or<T>//逻辑或
+		template<class T> bool logical_not<T>//逻辑非
+========================================================================
+2）函数对象适配器
+	bind1st ： 将参数绑定为函数对象的第一个参数
+	bind2nd ： 将参数绑定为函数对象的第二个参数
+	bind1st bind2nd将二元函数对象转为一元函数对象
+
+	not1 对一元函数对象取反
+	not2 对二元函数对象取反
+	
+	 ptr_fun( )把一个普通的函数指针适配成函数对象
+========================================================================
+3）算法
+	算法主要是由头文件<algorithm> <functional> <numeric>组成
+========================================================================
+4）遍历算法
+	遍历算法 遍历容器元素
+	for_each(iterator beg, iterator end, _callback);	
+		param beg 开始迭代器
+		param end 结束迭代器
+		param _callback  函数回调或者函数对象
+		return 函数对象
+
+	将指定容器区间元素搬运到另一容器中
+	transform(iterator beg1, iterator end1, iterator beg2, _callbakc)
+		param beg1 源容器开始迭代器
+		param end1 源容器结束迭代器
+		param beg2 目标容器开始迭代器
+		param _cakkback 回调函数或者函数对象
+		return 返回目标容器迭代器
+========================================================================
+5）查找算法
+	查找元素
+	find(iterator beg, iterator end, value)
+		param beg 容器开始迭代器
+		param end 容器结束迭代器
+		param value 查找的元素
+		return 返回查找元素的位置
+
+	条件查找
+	find_if(iterator beg, iterator end, _callback);
+	param beg 容器开始迭代器
+		param end 容器结束迭代器
+		param  callback 回调函数或者谓词(返回bool类型的函数对象)
+		return bool 查找返回true 否则false
+
+	查找相邻重复元素
+	adjacent_find(iterator beg, iterator end, _callback);
+		param beg 容器开始迭代器
+		param end 容器结束迭代器
+		param  _callback 回调函数或者谓词(返回bool类型的函数对象)
+		return 返回相邻元素的第一个位置的迭代器
+
+	 二分查找法
+	bool binary_search(iterator beg, iterator end, value);
+	注意: 在无序序列中不可用
+		param beg 容器开始迭代器
+		param end 容器结束迭代器
+		param value 查找的元素
+		return bool 查找返回true 否则false
+
+	统计元素出现次数
+	count(iterator beg, iterator end, value);
+		param beg 容器开始迭代器
+		param end 容器结束迭代器
+		param  value回调函数或者谓词(返回bool类型的函数对象)
+		return int返回元素个数
+
+	统计元素出现次数
+	count_if(iterator beg, iterator end, _callback);
+		param beg 容器开始迭代器
+		param end 容器结束迭代器
+		param  callback 回调函数或者谓词(返回bool类型的函数对象)
+		return int返回元素个数
+========================================================================
+6）排序算法
+	容器元素合并，并存储到另一容器中
+	merge(iterator beg1, iterator end1, iterator beg2, iterator end2, iterator dest)
+	注意:两个容器必须是有序的
+		param beg1 容器1开始迭代器
+		param end1 容器1结束迭代器
+		param beg2 容器2开始迭代器
+		param end2 容器2结束迭代器
+		param dest  目标容器开始迭代器
+	
+	容器元素排序
+	sort(iterator beg, iterator end, _callback)
+		param beg 容器1开始迭代器
+		param end 容器1结束迭代器
+		param _callback 回调函数或者谓词(返回bool类型的函数对象)
+
+	对指定范围内的元素随机调整次序
+	random_shuffle(iterator beg, iterator end)
+		param beg 容器开始迭代器
+		param end 容器结束迭代器
+
+	反转指定范围的元素
+	reverse(iterator beg, iterator end)
+		param beg 容器开始迭代器
+		param end 容器结束迭代器
+========================================================================
+7）拷贝和替换算法
+	将容器内指定范围的元素拷贝到另一容器中
+	copy(iterator beg, iterator end, iterator dest)
+		param beg 容器开始迭代器
+		param end 容器结束迭代器
+		param dest 目标起始迭代器
+
+	将容器内指定范围的旧元素修改为新元素
+	replace(iterator beg, iterator end, oldvalue, newvalue
+		param beg 容器开始迭代器
+		param end 容器结束迭代器
+		param oldvalue 旧元素
+		param oldvalue 新元素
+
+	将容器内指定范围满足条件的元素替换为新元素
+	replace_if(iterator beg, iterator end, _callback, newvalue)
+		param beg 容器开始迭代器
+		param end 容器结束迭代器
+		param callback函数回调或者谓词(返回Bool类型的函数对象)
+		param oldvalue 新元素
+
+	互换两个容器的元素
+	swap(container c1, container c2)
+		param c1容器1
+		param c2容器2
+========================================================================
+8）算数生成算法
+	计算容器元素累计总和
+	accumulate(iterator beg, iterator end, value)
+		param beg 容器开始迭代器
+		param end 容器结束迭代器
+		param value累加值
+
+	向容器中添加元素
+	fill(iterator beg, iterator end, value)
+		param beg 容器开始迭代器
+		param end 容器结束迭代器
+		param value t填充元素
+========================================================================
+9）集合算法
+	求两个set集合的交集
+	set_intersection(iterator beg1, iterator end1, iterator beg2, iterator end2, iterator dest)
+	注意:两个集合必须是有序序列
+		param beg1 容器1开始迭代器
+		param end1 容器1结束迭代器
+		param beg2 容器2开始迭代器
+		param end2 容器2结束迭代器
+		param dest  目标容器开始迭代器
+		return 目标容器的最后一个元素的迭代器地址
+
+	求两个set集合的并集
+	set_union(iterator beg1, iterator end1, iterator beg2, iterator end2, iterator dest)
+	注意:两个集合必须是有序序列
+		param beg1 容器1开始迭代器
+		param end1 容器1结束迭代器
+		param beg2 容器2开始迭代器
+		param end2 容器2结束迭代器
+		param dest  目标容器开始迭代器
+		return 目标容器的最后一个元素的迭代器地址
+
+	求两个set集合的差集
+	set_difference(iterator beg1, iterator end1, iterator beg2, iterator end2, iterator dest)
+	注意:两个集合必须是有序序列
+		param beg1 容器1开始迭代器
+		param end1 容器1结束迭代器
+		param beg2 容器2开始迭代器
+		param end2 容器2结束迭代器
+		param dest  目标容器开始迭代器
+		return 目标容器的最后一个元素的迭代器地址
+========================================================================

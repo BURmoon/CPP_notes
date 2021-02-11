@@ -1,0 +1,159 @@
+## 1 概述
+
+> 一个B类继承于A类，或称从类A派生类B，则称类A为基类，类B为派生类
+
+- 父类中的私有属性，子类是继承下去了，只不过由编译器给隐藏了
+
+### 1.1 继承方式
+
+- public：	公有继承
+
+  private：	私有继承
+
+  protected：	保护继承
+
+- 单继承：指每个派生类只直接继承了一个基类的特征
+
+  多继承：指多个基类派生出一个派生类的继承关系
+
+### 1.2 继承中同名成员
+
+> 在子类通过作用域::进行同名成员区分
+
+- 当子类成员和父类成员同名时，子类依然从父类继承同名成员
+- 如果子类有成员和父类同名，子类访问其成员默认访问子类的成员(本作用域，就近原则)
+- 任何时候重新定义基类中的一个重载函数，在新类中所有的其他版本将被自动隐藏
+
+```
+class Base{
+	void func1(){};
+	void func1(int param){}
+	void myfunc(){}
+	};
+class Derived1 : public Base{
+	void myfunc(){}
+	};
+class Derived2 : public Base{
+	void func1(int param1, int param2){};	//改变成员函数的参数列表
+	};
+class Derived3 : public Base{
+	int func1(int param){}		//改变成员函数的返回值
+	};
+	
+Derived1 derived1;
+	derived1.func1();
+	derived1.func1(20);
+	derived1.myfunc();
+Derived2 derived2;
+	derived2.func1();  		//func1被隐藏
+	derived2.func1(20); 	//func1被隐藏
+	derived2.func1(10,20); 	//重载func1之后，基类的函数被隐藏
+	derived2.myfunc();
+Derived3 derived3;
+	derived3.func1();  		//没有重新定义的重载版本被隐藏
+	derived3.func1(20);
+	derived3.myfunc();
+```
+
+### 1.3 非自动继承的函数
+
+- 构造函数和析构函数不能被继承，必须为每一个特定的派生类分别创建
+- operator=也不能被继承
+- 在继承的过程中，如果没有创建这些函数，编译器会自动生成它们
+
+## 2 派生类
+
+```
+Class 派生类名 : 继承方式 基类名{
+		//派生类新增的数据成员和成员函数
+}
+```
+
+- 公有(public)继承
+  - 基类public属性	派生类public属性
+  - 基类protected属性	派生类protected属性
+  - 基类private属性	派生类不可访问
+- 私有(private)继承
+  - 基类public属性	派生类private属性
+  - 基类protected属性	派生类private属性
+  - 基类private属性	派生类不可访问
+- 保护(protected)继承
+  - 基类public属性	派生类protected属性
+  - 基类protected属性	派生类protected属性
+  - 基类private属性	派生类不可访问
+
+## 3 继承中的构造和析构
+
+- 子类对象在创建时会首先调用父类的构造函数
+- 父类构造函数执行完毕后，才会调用子类的构造函数
+- 当父类构造函数有参数时，需要在子类初始化列表(参数列表)中显示调用父类构造函数
+- 析构函数调用顺序和构造函数相反
+
+## 4 继承中的静态成员
+
+- 静态成员函数和非静态成员函数都可以被继承到派生类中
+- 重新定义一个静态成员函数，所有在基类中的其他重载函数会被隐藏
+- 改变基类中一个函数的特征（返回值或者参数个数），所有使用该函数名的基类版本都会被隐藏
+
+## 5 菱形继承
+
+> 两个派生类继承同一个基类而又有某个类同时继承者两个派生类
+
+- 菱形继承会产生二义性以及重复继承的问题
+
+## 6 虚继承
+
+> ```
+> class Base1 : virtual public BigBase{};
+> class Base2 : virtual public BigBase{};
+> ```
+>
+> Base1采用虚继承方式继承BigBase,那么BigBase被称为虚基类
+>
+> 虚继承只能解决具备公共祖先的多继承所带来的二义性问题，不能解决没有公共祖先的多继承的
+
+- 当发生虚继承后，子类中继承了一个vbptr指针（虚基类指针），指向的是一个虚基类表vbtable
+- 当使用虚继承时，虚基类是被共享的，也就是在继承体系中无论被继承多少次，对象内存模型中均只会出现一个虚基类的子对象，即共享虚基类
+
+
+
+```
+
+
+7）重定义
+-----------------------------------------------------
+
+	class Base{
+	void func1(){};
+	void func1(int param){}
+	void myfunc(){}
+	};
+	class Derived1 : public Base{
+	void myfunc(){}
+	};
+	class Derived2 : public Base{
+	//改变成员函数的参数列表
+	void func1(int param1, int param2){};
+	};
+	class Derived3 : public Base{
+	//改变成员函数的返回值
+	int func1(int param){}
+	};
+	
+	Derived1 derived1;
+		derived1.func1();
+		derived1.func1(20);
+		derived1.myfunc();
+	Derived2 derived2;
+		//derived2.func1();  		//func1被隐藏
+		//derived2.func1(20); 	//func2被隐藏
+		derived2.func1(10,20); 	//重载func1之后，基类的函数被隐藏
+		derived2.myfunc();
+	Derived3 derived3;
+		//derived3.func1();  		//没有重新定义的重载版本被隐藏
+		derived3.func1(20);
+		derived3.myfunc();
+
+=========================================================================
+```
+
