@@ -1,0 +1,36 @@
+## 全排列
+
+- 123的全排列有123、132、213、231、312、321这六种
+- 全排列就是从第一个数字起每个数分别与它后面的数字交换
+
+```c
+void perm( int pos, vector<int> &num, vector<vector<int>> &all_result) 
+{
+  if (pos + 1 == num.size()) 
+  {
+    // 一次全排列的结果
+    all_result.push_back(num);
+    return;
+  }
+  for (int i = pos; i < num.size(); ++i) 
+  {
+    //第i个数分别与它后面的数字交换就能得到新的排列
+    swap(num[pos], num[i]);
+    perm(pos+1, num, all_result);
+    swap(num[pos], num[i]);
+  }
+}
+	
+int main() {
+  vector<int> num = {1, 2, 3};
+  vector<vector<int>> all_result;
+  perm(0, num, all_result);
+}
+```
+
+
+
+
+
+
+

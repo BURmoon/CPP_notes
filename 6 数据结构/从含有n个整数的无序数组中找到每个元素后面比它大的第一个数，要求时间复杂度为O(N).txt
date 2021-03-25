@@ -1,0 +1,46 @@
+## 题目
+
+从含有n个整数的无序数组中找到每个元素后面比它大的第一个数，要求时间复杂度为O(N)
+
+## 解题思路
+
+对于当前遍历的第i个元素有
+
+- 栈为空，则当前索引 i 入栈
+- 栈不为空，如果栈顶索引元素大于等于当前元素，则将当前索引 i 入栈
+- 栈不为空，如果栈顶索引元素小于当前元素
+  - 则栈顶索引元素对应的第一个比它大的元素就是当前元素，保存当前元素
+  - 同时为了保证栈底到栈顶非升序需要将栈顶元素弹出
+- 输入遍历完，栈中还剩余的元素则是不能找见之后比他大的元素
+
+## 代码
+
+```c
+vector<int> findMax(const vector<int>& nums)
+{
+	int n = nums.size();
+	if (n == 0)
+		return vector<int>();
+	vector<int> res(n);
+	int i = 0;
+	stack<int> s;
+	while (i < n)
+	{
+		if (s.empty() || nums[s.top()] >= nums[i])
+			s.push(i++);
+		else
+		{
+			res[s.top()] = nums[i];
+			s.pop();
+		}
+	}
+	//处理当前栈中剩下的元素，也就是找不到它之后比它大的元素
+	while (!s.empty())
+	{
+		res[s.top()] = INT_MAX;
+		s.pop();
+	}
+	return res;
+}
+```
+

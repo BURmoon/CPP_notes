@@ -1,0 +1,31 @@
+## 题目
+
+一个长度为N的整形数组，数组中每个元素的取值范围是[0,N-1]，写一个算法判断数组中是否存在重复的数字
+
+## 解题思路
+
+把每个数放到自己对应序号的位置上，如果其他位置上有和自己对应序号相同的数，那么即为有重复的数值
+
+## 代码
+
+```c
+
+bool IsDuplicateNumber(int *array, int n)
+{	
+    if(array==NULL) return false;	
+    int i,temp;
+    for(i=0;i<n;i++)		
+    {	
+        while(array[i]!=i)			
+        {		
+            if(array[array[i]]==array[i]) 
+				return true;	
+            temp=array[array[i]];	
+            array[array[i]]=array[i];		
+            array[i]=temp;			
+        }		
+    }	
+    return false;	
+
+```
+
